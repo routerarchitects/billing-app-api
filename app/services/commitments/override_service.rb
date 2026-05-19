@@ -10,7 +10,7 @@ module Commitments
     end
 
     def call
-      return result if !License.premium? || !commitment
+      return result if !commitment
 
       ActiveRecord::Base.transaction do
         new_commitment = commitment.dup.tap do |c|

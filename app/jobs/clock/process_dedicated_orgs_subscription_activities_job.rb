@@ -5,7 +5,6 @@ module Clock
     unique :until_executed, on_conflict: :log
 
     def perform
-      return unless License.premium?
 
       organization_ids = Utils::DedicatedWorkerConfig.organization_ids
       return if organization_ids.empty?

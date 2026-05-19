@@ -124,7 +124,6 @@ module UsageMonitoring
     end
 
     def track_subscription_activity
-      return unless License.premium?
       return unless subscription.active?
 
       UsageMonitoring::SubscriptionActivity.insert_all( # rubocop:disable Rails/SkipsModelValidations
@@ -134,7 +133,6 @@ module UsageMonitoring
     end
 
     def process_wallet_alerts
-      return unless License.premium?
       return unless wallet.active?
 
       UsageMonitoring::ProcessWalletAlertsJob.perform_later(wallet)

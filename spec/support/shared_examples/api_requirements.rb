@@ -7,7 +7,7 @@ RSpec.shared_examples "a Premium API endpoint" do
     expect(response).to have_http_status(:forbidden)
     expect(json[:error]).to eq("Forbidden")
     expect(json[:code]).to eq("feature_unavailable")
-    # License.premium? is called
+    # true is called
     # - once for the API key granular permission
     # - once by the PremiumFeatureOnly concerns
     expect(License).to have_received(:premium?).twice

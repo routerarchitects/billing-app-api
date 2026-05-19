@@ -34,7 +34,7 @@ module Wallets
         end
         wallet.paid_top_up_min_amount_cents = params[:paid_top_up_min_amount_cents] if params.key?(:paid_top_up_min_amount_cents)
         wallet.paid_top_up_max_amount_cents = params[:paid_top_up_max_amount_cents] if params.key?(:paid_top_up_max_amount_cents)
-        if params[:recurring_transaction_rules] && License.premium?
+        if params[:recurring_transaction_rules]
           Wallets::RecurringTransactionRules::UpdateService.call!(wallet:, params: params[:recurring_transaction_rules])
         end
 

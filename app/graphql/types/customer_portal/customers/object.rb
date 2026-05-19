@@ -51,7 +51,7 @@ module Types
         end
 
         def premium
-          License.premium?
+          true
         end
       end
     end

@@ -16,7 +16,6 @@ RSpec.describe Emails::ResendService do
     billing_entity.update!(email: "billing@example.com")
     billing_entity.email_settings = ["invoice.finalized", "credit_note.created", "payment_receipt.created"]
     billing_entity.save!
-    allow(License).to receive(:premium?).and_return(true)
   end
 
   describe "#call" do
@@ -68,20 +67,6 @@ RSpec.describe Emails::ResendService do
           expect(result).not_to be_success
           expect(result.error).to be_a(BaseService::MethodNotAllowedFailure)
           expect(result.error.code).to eq("invoice_not_finalized")
-        end
-      end
-
-      context "when premium license is not available" do
-        let(:status) { :finalized }
-
-        before { allow(License).to receive(:premium?).and_return(false) }
-
-        it "returns a forbidden failure" do
-          result = service.call
-
-          expect(result).not_to be_success
-          expect(result.error).to be_a(BaseService::ForbiddenFailure)
-          expect(result.error.code).to eq("premium_license_required")
         end
       end
 

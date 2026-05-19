@@ -6,7 +6,6 @@ module DataApi
       Result = BaseResult[:invoiced_usages]
 
       def call
-        return result.forbidden_failure! unless License.premium?
 
         data_invoiced_usages = http_client.get(headers:, params:)
 

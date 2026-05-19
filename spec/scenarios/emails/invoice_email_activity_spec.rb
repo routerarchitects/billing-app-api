@@ -24,15 +24,6 @@ describe "Invoice Email Activity Logging", :capture_kafka_messages do
     perform_all_enqueued_jobs
   end
 
-  # Pretend License is premium for these tests
-  around do |example|
-    old_premium = License.premium?
-    License.instance_variable_set(:@premium, true)
-    example.run
-  ensure
-    License.instance_variable_set(:@premium, old_premium)
-  end
-
   context "when invoice is finalized" do
     it "logs email activity to Kafka" do
       expect(email_messages.size).to eq(1)
@@ -62,14 +53,4 @@ describe "Invoice Email Activity Logging", :capture_kafka_messages do
     end
   end
 
-  context "when License is not premium" do
-    around do |example|
-      License.instance_variable_set(:@premium, false)
-      example.run
-    end
-
-    it "does not log email activity" do
-      expect(email_messages).to be_empty
-    end
-  end
 end

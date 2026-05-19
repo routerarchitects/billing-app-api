@@ -10,7 +10,6 @@ module PricingUnits
     end
 
     def call
-      return result.forbidden_failure! unless License.premium?
 
       pricing_unit = PricingUnit.create!(
         params.slice(:organization, :name, :code, :short_name, :description)

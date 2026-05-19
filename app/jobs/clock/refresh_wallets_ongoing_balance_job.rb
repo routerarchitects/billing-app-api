@@ -5,7 +5,6 @@ module Clock
     unique :until_executed, on_conflict: :log
 
     def perform
-      return unless License.premium?
 
       scope = Customer.with_active_wallets.awaiting_wallet_refresh.without_tax_errors
 

@@ -16,7 +16,6 @@ module Resolvers
       type Types::Analytics::Mrrs::Object.collection_type, null: false
 
       def resolve(**args)
-        raise unauthorized_error unless License.premium?
 
         ::Analytics::Mrr.find_all_by(current_organization.id, **args.merge({months: 12}))
       end

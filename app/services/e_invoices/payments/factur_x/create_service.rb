@@ -11,7 +11,6 @@ module EInvoices
 
       def call
         return result.not_found_failure!(resource: "payment") unless payment
-        return result.forbidden_failure! unless payment.organization.issue_receipts_enabled?
 
         result.xml = Nokogiri::XML::Builder.new(encoding: "UTF-8") do |xml|
           EInvoices::Payments::FacturX::Builder.serialize(xml:, payment:)

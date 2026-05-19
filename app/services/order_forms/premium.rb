@@ -7,7 +7,7 @@ module OrderForms
     private
 
     def order_forms_enabled?(organization)
-      License.premium? && organization.feature_flag_enabled?(:order_forms)
+      organization.feature_flag_enabled?(:order_forms)
     end
   end
 end

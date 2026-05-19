@@ -5,7 +5,6 @@ module DataApi
     Result = BaseResult[:mrrs]
 
     def call
-      return result.forbidden_failure! unless License.premium?
 
       data_mrrs = http_client.get(headers:, params:)
 

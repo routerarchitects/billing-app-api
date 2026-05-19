@@ -5,7 +5,6 @@ module DataApi
     Result = BaseResult[:prepaid_credits]
 
     def call
-      return result.forbidden_failure! unless License.premium?
 
       result.prepaid_credits = http_client.get(headers:, params:)
       result

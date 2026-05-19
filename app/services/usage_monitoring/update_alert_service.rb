@@ -79,7 +79,6 @@ module UsageMonitoring
       active_subscription = organization.subscriptions.active
         .find_by(external_id: alert.subscription_external_id)
       return unless active_subscription
-      return unless License.premium?
 
       UsageMonitoring::SubscriptionActivity.insert_all( # rubocop:disable Rails/SkipsModelValidations
         [{organization_id: organization.id, subscription_id: active_subscription.id}],
@@ -89,7 +88,6 @@ module UsageMonitoring
 
     def process_wallet_alerts
       return unless alert.wallet_id?
-      return unless License.premium?
       return unless alert.wallet&.active?
 
       UsageMonitoring::ProcessWalletAlertsJob.perform_later(alert.wallet)

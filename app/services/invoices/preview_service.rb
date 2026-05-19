@@ -16,10 +16,8 @@ module Invoices
     end
 
     def call
-      return result.forbidden_failure! unless License.premium?
       return result.not_found_failure!(resource: "customer") unless customer
       return result.not_found_failure!(resource: "subscription") if subscriptions.empty?
-      return result.not_allowed_failure!(code: "premium_integration_missing") if persisted_subscriptions && !organization.preview_enabled?
       return result unless currencies_aligned?
       return result unless billing_times_aligned?
 

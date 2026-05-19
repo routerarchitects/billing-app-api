@@ -14,7 +14,6 @@ module Resolvers
     type Types::AiConversations::Object.collection_type, null: true
 
     def resolve(limit: nil)
-      raise unauthorized_error unless License.premium?
       raise forbidden_error(code: "feature_unavailable") if ENV["MISTRAL_API_KEY"].blank? || ENV["MISTRAL_AGENT_ID"].blank?
 
       membership = current_organization.memberships.find_by(user_id: context[:current_user].id)

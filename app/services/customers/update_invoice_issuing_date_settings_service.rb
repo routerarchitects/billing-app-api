@@ -51,11 +51,11 @@ module Customers
         customer.subscription_invoice_issuing_date_adjustment = billing_configuration[:subscription_invoice_issuing_date_adjustment]
       end
 
-      if License.premium? && params.key?(:invoice_grace_period)
+      if params.key?(:invoice_grace_period)
         customer.invoice_grace_period = params[:invoice_grace_period]
       end
 
-      if License.premium? && billing_configuration.key?(:invoice_grace_period)
+      if billing_configuration.key?(:invoice_grace_period)
         customer.invoice_grace_period = billing_configuration[:invoice_grace_period]
       end
     end

@@ -43,7 +43,7 @@ module Payments
       end
 
       after_commit do
-        PaymentReceipts::CreateJob.perform_later(result.payment) if organization.issue_receipts_enabled?
+        PaymentReceipts::CreateJob.perform_later(result.payment)
 
         if result.payment&.should_sync_payment?
           Integrations::Aggregator::Payments::CreateJob.perform_later(payment: result.payment)
@@ -75,7 +75,6 @@ module Payments
       return result.not_found_failure!(resource: "invoice") unless invoice
       return result if invoice.invoice_type == "advance_charges"
 
-      return result.forbidden_failure! if !License.premium?
       return result.forbidden_failure! unless invoice.allow_manual_payment?
 
       result.single_validation_failure!(error_code: "invalid_date", field: "paid_at") unless valid_paid_at?

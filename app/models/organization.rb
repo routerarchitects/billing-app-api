@@ -17,7 +17,8 @@ class Organization < ApplicationRecord
   ].freeze
 
   MULTI_ENTITIES_MAX = {
-    default: 1,
+    # OSS: do not cap billing entities behind a commercial tier.
+    default: Float::INFINITY,
     pro: 2,
     enterprise: Float::INFINITY
   }.freeze
@@ -187,7 +188,7 @@ class Organization < ApplicationRecord
     scope "with_#{premium_integration}_support", -> { where("? = ANY(premium_integrations)", premium_integration) }
 
     define_method("#{premium_integration}_enabled?") do
-      License.premium? && premium_integrations.include?(premium_integration)
+      premium_integrations.include?(premium_integration)
     end
   end
 
@@ -232,7 +233,7 @@ class Organization < ApplicationRecord
   end
 
   def from_email_address
-    return email if from_email_enabled?
+    return email if email.present?
 
     ENV["LAGO_FROM_EMAIL"]
   end

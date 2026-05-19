@@ -10,18 +10,7 @@ RSpec.describe PaymentReceipts::CreateService do
   let(:payment) { create(:payment, payable: invoice) }
 
   describe "#call" do
-    context "when issuing receipts is not enabled" do
-      it "returns forbidden failure" do
-        result = described_class.call(payment:)
-
-        expect(result).not_to be_success
-        expect(result.error).to be_a(BaseService::ForbiddenFailure)
-      end
-    end
-
-    context "when issuing receipts is enabled", :premium do
-      before { organization.update!(premium_integrations: %w[issue_receipts]) }
-
+    context "when payment receipt creation is allowed" do
       context "when customer is a partner account" do
         let(:customer) { create(:customer, organization:, account_type: :partner) }
 

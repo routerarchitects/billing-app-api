@@ -6,7 +6,6 @@ module Integrations
       def call(**args)
         organization = Organization.find_by(id: args[:organization_id])
 
-        return result.forbidden_failure! unless License.premium?
 
         integration = Integrations::AnrokIntegration.new(
           organization:,

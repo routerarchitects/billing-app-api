@@ -58,7 +58,6 @@ unless john_doe.wallets.active.exists?
     paid_top_up_min_amount_cents: 12_00
   }
 
-  if License.premium?
     params[:recurring_transaction_rules] = [
       {
         granted_credits: "10",
@@ -101,7 +100,6 @@ one_off = Invoices::CreateOneOffService.call!(
   skip_psp: true
 ).invoice
 
-if License.premium?
   CreditNotes::CreateService.call!(
     invoice: one_off,
     credit_amount_cents: 48_00,

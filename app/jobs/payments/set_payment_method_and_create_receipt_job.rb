@@ -15,10 +15,8 @@ module Payments
 
       ::Payments::SetPaymentMethodDataService.call!(payment:, provider_payment_method_id:)
 
-      # Now that the payment method is saved in the payment, we generate the PaymentReceipt
-      if payment.customer.organization.issue_receipts_enabled?
-        PaymentReceipts::CreateJob.perform_later(payment)
-      end
+      # Now that the payment method is saved in the payment, we generate the PaymentReceipt.
+      PaymentReceipts::CreateJob.perform_later(payment)
     end
 
     private

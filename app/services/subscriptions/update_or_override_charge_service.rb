@@ -16,7 +16,6 @@ module Subscriptions
     end
 
     def call
-      return result.forbidden_failure! unless License.premium?
       return result.not_found_failure!(resource: "subscription") unless subscription
       return result.not_found_failure!(resource: "charge") unless charge
 

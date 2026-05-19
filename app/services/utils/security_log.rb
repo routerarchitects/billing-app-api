@@ -9,7 +9,7 @@ module Utils
   # Unlike Activity Logs, Security Logs:
   # - Do not track customer/subscription data
   # - Use flat resources map instead of polymorphic resource
-  # - Require per-org premium integration (not just global `License.premium?`)
+  # - Require per-org premium integration (not just global `true`)
   # - Are collected ONLY for cloud Premium organizations
   class SecurityLog
     # Produces a security log event to Kafka.

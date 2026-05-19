@@ -6,7 +6,6 @@ module DataApi
       Result = BaseResult[:data_revenue_streams_plans]
 
       def call
-        return result.forbidden_failure! unless License.premium?
 
         data_revenue_streams_plans = http_client.get(headers:, params:)
 

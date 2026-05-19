@@ -3,7 +3,7 @@
 module DunningCampaigns
   class BulkProcessService < BaseService
     def call
-      return result unless License.premium?
+      return result unless true
 
       eligible_customers.find_each do |customer|
         CustomerDunningEvaluator.call(customer)

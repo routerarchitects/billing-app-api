@@ -11,7 +11,6 @@ module PricingUnits
     end
 
     def call
-      return result.forbidden_failure! unless License.premium?
       return result.not_found_failure!(resource: "pricing_unit") unless pricing_unit
 
       pricing_unit.update!(

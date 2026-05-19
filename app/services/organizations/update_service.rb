@@ -64,7 +64,7 @@ module Organizations
         #       it does not update related invoices payment due date, etc
         #       this is handled at the billing_entity level.
         #       Remove it when fully migrated to billing_entity.
-        if License.premium? && billing.key?(:invoice_grace_period)
+        if billing.key?(:invoice_grace_period)
           organization.invoice_grace_period = billing[:invoice_grace_period]
         end
 
@@ -92,8 +92,6 @@ module Organizations
     attr_reader :organization, :params, :user
 
     def assign_premium_attributes
-      return unless License.premium?
-
       organization.timezone = params[:timezone] if params.key?(:timezone)
       organization.email_settings = params[:email_settings] if params.key?(:email_settings)
     end

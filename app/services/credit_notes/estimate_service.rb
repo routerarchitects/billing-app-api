@@ -11,7 +11,6 @@ module CreditNotes
 
     def call
       return result.not_found_failure!(resource: "invoice") unless invoice
-      return result.forbidden_failure! unless License.premium?
       return result.not_allowed_failure!(code: "invalid_type_or_status") unless valid_type_or_status?
 
       @credit_note = CreditNote.new(

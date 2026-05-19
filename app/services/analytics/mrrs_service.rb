@@ -3,7 +3,6 @@
 module Analytics
   class MrrsService < BaseService
     def call
-      return result.forbidden_failure! unless License.premium?
 
       @records = ::Analytics::Mrr.find_all_by(organization.id, **filters)
 

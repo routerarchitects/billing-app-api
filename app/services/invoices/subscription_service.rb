@@ -170,8 +170,7 @@ module Invoices
     end
 
     def should_deliver_finalized_email?
-      License.premium? &&
-        customer.billing_entity.email_settings.include?("invoice.finalized")
+      customer.billing_entity.email_settings.include?("invoice.finalized")
     end
 
     def flag_lifetime_usage_for_refresh

@@ -65,7 +65,6 @@ module PaymentRequests
       # - the invoices have different currencies
       # - the invoices are not ready for payment processing
 
-      return result.forbidden_failure! unless License.premium?
       return result.not_found_failure!(resource: "customer") unless customer
       return result.not_found_failure!(resource: "invoice") if invoices.empty?
 

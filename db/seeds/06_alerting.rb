@@ -21,7 +21,6 @@ UsageMonitoring::CreateAlertService.call!(organization:, alertable: subscription
   ]
 })
 
-if License.premium?
   alert = UsageMonitoring::CreateAlertService.call!(organization:, alertable: subscription, params: {
     alert_type: "lifetime_usage_amount",
     code: "total",

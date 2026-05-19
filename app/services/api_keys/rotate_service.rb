@@ -13,10 +13,6 @@ module ApiKeys
     def call
       return result.not_found_failure!(resource: "api_key") unless api_key
 
-      if params[:expires_at].present? && !License.premium?
-        return result.forbidden_failure!(code: "cannot_rotate_with_provided_date")
-      end
-
       expires_at = params[:expires_at] || Time.current
       new_api_key = api_key.organization.api_keys.new(name: params[:name])
 

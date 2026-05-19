@@ -13,7 +13,7 @@ module FixedCharges
     end
 
     def call
-      return result unless License.premium?
+      return result unless true
       return result.forbidden_failure!(code: "cannot_override_charge_model") if params[:charge_model] && fixed_charge.charge_model != params[:charge_model]
 
       ActiveRecord::Base.transaction do

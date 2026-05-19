@@ -29,13 +29,11 @@ module BillingEntities
         handle_eu_tax_management if params[:eu_tax_management]
         handle_base64_logo
 
-        if License.premium?
-          billing_entity.invoice_grace_period = billing_config[:invoice_grace_period] if billing_config[:invoice_grace_period]
-          billing_entity.timezone = params[:timezone] if params[:timezone]
-          billing_entity.email_settings = params[:email_settings] if params[:email_settings]
-          billing_entity.subscription_invoice_issuing_date_anchor = billing_config[:subscription_invoice_issuing_date_anchor] if billing_config[:subscription_invoice_issuing_date_anchor]
-          billing_entity.subscription_invoice_issuing_date_adjustment = billing_config[:subscription_invoice_issuing_date_adjustment] if billing_config[:subscription_invoice_issuing_date_adjustment]
-        end
+        billing_entity.invoice_grace_period = billing_config[:invoice_grace_period] if billing_config[:invoice_grace_period]
+        billing_entity.timezone = params[:timezone] if params[:timezone]
+        billing_entity.email_settings = params[:email_settings] if params[:email_settings]
+        billing_entity.subscription_invoice_issuing_date_anchor = billing_config[:subscription_invoice_issuing_date_anchor] if billing_config[:subscription_invoice_issuing_date_anchor]
+        billing_entity.subscription_invoice_issuing_date_adjustment = billing_config[:subscription_invoice_issuing_date_adjustment] if billing_config[:subscription_invoice_issuing_date_adjustment]
 
         billing_entity.save!
       end

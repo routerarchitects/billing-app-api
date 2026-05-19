@@ -13,10 +13,6 @@ module Integrations
       def call
         return result.not_found_failure!(resource: "integration") unless integration
 
-        unless integration.organization.okta_enabled?
-          return result.not_allowed_failure!(code: "premium_integration_missing")
-        end
-
         integration.client_id = params[:client_id] if params.key?(:client_id)
         integration.client_secret = params[:client_secret] if params.key?(:client_secret)
         integration.domain = params[:domain] if params.key?(:domain)

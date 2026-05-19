@@ -109,7 +109,7 @@ module Invoices
     end
 
     def should_deliver_email?
-      License.premium? && customer.billing_entity.email_settings.include?("invoice.finalized")
+      customer.billing_entity.email_settings.include?("invoice.finalized")
     end
 
     def should_create_applied_prepaid_credit?

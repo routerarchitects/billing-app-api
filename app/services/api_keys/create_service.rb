@@ -8,11 +8,6 @@ module ApiKeys
     end
 
     def call
-      return result.forbidden_failure! unless License.premium?
-
-      if params[:permissions].present? && !params[:organization].api_permissions_enabled?
-        return result.forbidden_failure!(code: "premium_integration_missing")
-      end
 
       api_key = ApiKey.create!(
         params.slice(:organization, :name, :permissions)

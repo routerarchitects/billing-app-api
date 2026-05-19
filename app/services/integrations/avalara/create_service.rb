@@ -14,10 +14,6 @@ module Integrations
       def call
         organization = Organization.find_by(id: params[:organization_id])
 
-        unless organization.avalara_enabled?
-          return result.not_allowed_failure!(code: "premium_integration_missing")
-        end
-
         integration = Integrations::AvalaraIntegration.new(
           organization:,
           name: params[:name],

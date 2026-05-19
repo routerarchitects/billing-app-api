@@ -13,7 +13,6 @@ module Plans
     end
 
     def call
-      return result.forbidden_failure! unless License.premium?
 
       ActiveRecord::Base.transaction do
         new_plan = plan.dup.tap do |p|
@@ -46,13 +45,12 @@ module Plans
         end
 
         if params[:usage_thresholds].present? &&
-            License.premium? &&
             plan.organization.progressive_billing_enabled?
 
           UsageThresholds::OverrideService.call(usage_thresholds_params: params[:usage_thresholds], new_plan: new_plan)
         end
 
-        if params[:minimum_commitment].present? && License.premium?
+        if params[:minimum_commitment].present?
           commitment = Commitment.new(
             organization_id: new_plan.organization_id, plan: new_plan, commitment_type: "minimum_commitment"
           )

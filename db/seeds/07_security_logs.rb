@@ -1,6 +1,5 @@
 # frozen_string_literal: true
 
-return unless License.premium?
 return if ENV["LAGO_CLICKHOUSE_ENABLED"].blank?
 
 topic = Utils::SecurityLog.topic

@@ -13,10 +13,6 @@ module Integrations
       def call
         return result.not_found_failure!(resource: "integration") unless integration
 
-        unless integration.organization.netsuite_enabled?
-          return result.not_allowed_failure!(code: "premium_integration_missing")
-        end
-
         old_script_url = integration.script_endpoint_url
 
         integration.name = params[:name] if params.key?(:name)

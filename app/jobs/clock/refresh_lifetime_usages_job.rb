@@ -5,7 +5,6 @@ module Clock
     unique :until_executed, on_conflict: :log
 
     def perform
-      return unless License.premium?
 
       Organization
         .with_progressive_billing_support

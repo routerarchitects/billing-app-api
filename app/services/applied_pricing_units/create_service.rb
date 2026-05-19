@@ -30,7 +30,7 @@ module AppliedPricingUnits
     end
 
     def create_applied_pricing_unit?
-      params.present? && License.premium?
+      params.present?
     end
 
     private

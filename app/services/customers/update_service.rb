@@ -221,7 +221,6 @@ module Customers
     end
 
     def assign_premium_attributes(customer, args)
-      return unless License.premium?
 
       customer.timezone = args[:timezone] if args.key?(:timezone)
     end

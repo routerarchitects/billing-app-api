@@ -165,9 +165,7 @@ class Charge < ApplicationRecord
   end
 
   def charge_model_allowance
-    if graduated_percentage? && !License.premium?
-      errors.add(:charge_model, :graduated_percentage_requires_premium_license)
-    end
+    # graduated_percentage is allowed in this build (no premium gating)
   end
 
   def validate_code_unique

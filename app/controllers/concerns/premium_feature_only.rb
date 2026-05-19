@@ -10,6 +10,5 @@ module PremiumFeatureOnly
   private
 
   def ensure_premium_license
-    forbidden_error(code: "feature_unavailable") unless License.premium?
   end
 end

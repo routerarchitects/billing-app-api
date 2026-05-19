@@ -62,7 +62,7 @@ module Plans
           end
         end
 
-        if args[:minimum_commitment].present? && License.premium?
+        if args[:minimum_commitment].present?
           minimum_commitment = args[:minimum_commitment]
           new_commitment = create_commitment(plan, minimum_commitment, :minimum_commitment)
           if minimum_commitment[:tax_codes].present?

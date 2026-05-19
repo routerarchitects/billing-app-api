@@ -13,7 +13,6 @@ module PaymentReceipts
 
     def call
       return result.not_found_failure!(resource: "payment") unless payment
-      return result.forbidden_failure! unless organization.issue_receipts_enabled?
       return result if payment.payable.customer.partner_account?
       return result if payment.payable_payment_status.to_s != "succeeded"
 
@@ -41,7 +40,7 @@ module PaymentReceipts
     attr_reader :payment, :organization, :billing_entity
 
     def should_deliver_email?
-      License.premium? && billing_entity.email_settings.include?("payment_receipt.created")
+      billing_entity.email_settings.include?("payment_receipt.created")
     end
   end
 end

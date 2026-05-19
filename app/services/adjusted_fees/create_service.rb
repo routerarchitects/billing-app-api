@@ -78,7 +78,7 @@ module AdjustedFees
     def forbidden?
       return false if regenerating_voided
 
-      !License.premium? || !invoice.draft?
+      !invoice.draft?
     end
 
     def find_or_create_fee

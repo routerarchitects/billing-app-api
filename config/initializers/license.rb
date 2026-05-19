@@ -3,5 +3,4 @@
 require "lago_utils"
 
 License = LagoUtils::License.new(Rails.application.config.license_url)
-
-License.verify unless Rails.env.test?
+# OSS: do not verify license with any remote endpoint at boot time.

@@ -14,9 +14,6 @@ module Roles
     end
 
     def call
-      return result.forbidden_failure! unless License.premium?
-      return result.forbidden_failure!(code: "premium_integration_missing") unless organization.custom_roles_enabled?
-
       role = organization.roles.create!(
         code:,
         name:,

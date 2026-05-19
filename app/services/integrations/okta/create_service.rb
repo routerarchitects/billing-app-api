@@ -6,10 +6,6 @@ module Integrations
       def call(**args) # rubocop:disable Cops/ServiceCallCop
         organization = Organization.find_by(id: args[:organization_id])
 
-        unless organization.okta_enabled?
-          return result.not_allowed_failure!(code: "premium_integration_missing")
-        end
-
         integration = Integrations::OktaIntegration.new(
           organization:,
           name: "Okta Integration",

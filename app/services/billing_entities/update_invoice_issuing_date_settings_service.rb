@@ -39,7 +39,7 @@ module BillingEntities
         billing_entity.subscription_invoice_issuing_date_adjustment = params[:subscription_invoice_issuing_date_adjustment]
       end
 
-      if License.premium? && params.key?(:invoice_grace_period)
+      if params.key?(:invoice_grace_period)
         billing_entity.invoice_grace_period = params[:invoice_grace_period]
       end
     end

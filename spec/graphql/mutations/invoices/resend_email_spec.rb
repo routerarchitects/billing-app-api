@@ -24,7 +24,6 @@ RSpec.describe Mutations::Invoices::ResendEmail do
     billing_entity.update!(email: "billing@example.com")
     billing_entity.email_settings = ["invoice.finalized"]
     billing_entity.save!
-    allow(License).to receive(:premium?).and_return(true)
   end
 
   it_behaves_like "requires current user"

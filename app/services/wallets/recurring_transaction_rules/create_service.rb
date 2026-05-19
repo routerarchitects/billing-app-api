@@ -13,7 +13,6 @@ module Wallets
       end
 
       def call
-        return unless License.premium?
         return result unless valid_payment_method?
 
         if method == "fixed" && rule_params[:paid_credits].nil? && rule_params[:granted_credits].nil?

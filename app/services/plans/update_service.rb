@@ -59,11 +59,11 @@ module Plans
         process_charges(plan, params[:charges]) if params[:charges]
         process_fixed_charges if params[:fixed_charges]
 
-        if params.key?(:usage_thresholds) && License.premium?
+        if params.key?(:usage_thresholds)
           Plans::UpdateUsageThresholdsService.call(plan:, usage_thresholds_params: params[:usage_thresholds])
         end
 
-        process_minimum_commitment(plan, params[:minimum_commitment]) if params[:minimum_commitment] && License.premium?
+        process_minimum_commitment(plan, params[:minimum_commitment]) if params[:minimum_commitment]
 
         if old_amount_cents != plan.amount_cents
           process_downgraded_subscriptions

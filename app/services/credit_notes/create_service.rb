@@ -140,7 +140,7 @@ module CreditNotes
       return true if automatic
 
       # NOTE: credit note is a premium feature
-      License.premium?
+      true
     end
 
     def valid_type_or_status?
