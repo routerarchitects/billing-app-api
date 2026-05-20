@@ -74,7 +74,13 @@ Rails.application.configure do
   end
 
   # Allow self-hosted deployments to override the license verification endpoint.
-  config.license_url = ENV.fetch("LAGO_LICENSE_URL", "https://license.getlago.com")
+  config.license_url = ENV.fetch("LAGO_LICENSE_URL") do
+    if ENV["LAGO_CLOUD"] == "true" && ENV["RAILS_ENV"] == "staging"
+      "http://license-web.default.svc.cluster.local"
+    else
+      "https://license.getlago.com"
+    end
+  end
 
   if ENV["LAGO_SMTP_ADDRESS"].present? && !ENV["LAGO_SMTP_ADDRESS"].empty?
     config.action_mailer.delivery_method = :smtp
