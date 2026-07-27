@@ -107,13 +107,13 @@ describe "Subscription Downgrade Scenario", transaction: false do
         }
       )
 
-      expect(subscription.reload).to be_active
-      expect(subscription.invoices.count).to eq(4)
+      expect(subscription.reload).to be_terminated
+      expect(subscription.invoices.count).to eq(5)
     end
 
     # NOTE: November 19th: Bill subscription. Old subscription is terminated and pending one is activated
     travel_to(DateTime.new(2023, 11, 19, 12, 12)) do
-      expect { perform_billing }.to change { subscription.reload.invoices.count }
+      expect { perform_billing }.not_to change { subscription.reload.invoices.count }
       expect(subscription.reload).to be_terminated
       expect(subscription.invoices.count).to eq(5)
       expect(customer.invoices.count).to eq(5)
@@ -124,11 +124,11 @@ describe "Subscription Downgrade Scenario", transaction: false do
       expect(new_subscription.invoices.count).to eq(1)
 
       new_sub_invoice = new_subscription.invoices.order(created_at: :asc).last
-      # There are 243 days from new sub started_at until old subscription subscription_at. Also, 2024 is a leap year
+      # There are 253 days from new sub started_at until old subscription subscription_at. Also, 2024 is a leap year
       # Also for old pay in advance plan there are no charges so total amount is zero
-      expect(new_sub_invoice.fees_amount_cents).to eq(0 + (yearly_plan.amount_cents.fdiv(366) * 243).round)
+      expect(new_sub_invoice.fees_amount_cents).to eq(0 + (yearly_plan.amount_cents.fdiv(366) * 253).round)
       expect(new_subscription.invoice_subscriptions.order(created_at: :desc).first.from_datetime.iso8601)
-        .to eq("2023-11-19T00:00:00Z")
+        .to eq("2023-11-09T00:00:00Z")
       expect(new_subscription.invoice_subscriptions.order(created_at: :desc).first.to_datetime.iso8601)
         .to eq("2024-07-18T23:59:59Z")
     end

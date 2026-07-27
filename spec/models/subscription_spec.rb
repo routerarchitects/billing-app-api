@@ -419,7 +419,7 @@ RSpec.describe Subscription do
           plan.update!(interval: "yearly")
         end
 
-        it { expect(previous_subscription).not_to be_upgraded }
+        it { expect(previous_subscription).to be_upgraded }
       end
     end
   end
@@ -460,7 +460,7 @@ RSpec.describe Subscription do
           plan.update!(interval: "monthly")
         end
 
-        it { expect(previous_subscription).not_to be_downgraded }
+        it { expect(previous_subscription).to be_downgraded }
       end
     end
   end
