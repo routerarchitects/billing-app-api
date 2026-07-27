@@ -147,17 +147,10 @@ class Subscription < ApplicationRecord
       return false
     end
 
-    interval_weights = {"weekly" => 1, "monthly" => 2, "quarterly" => 3, "semiannual" => 4, "yearly" => 5}
-    current_weight = interval_weights[plan.interval.to_s] || 0
-    next_weight = interval_weights[next_subscription.plan.interval.to_s] || 0
-
-    if next_weight > current_weight
-      true
-    elsif next_weight < current_weight
-      false
-    else
-      plan.yearly_amount_cents <= next_subscription.plan.yearly_amount_cents
-    end
+    Plans::ChangeClassificationService.call(
+      current_plan: plan,
+      target_plan: next_subscription.plan
+    ).classification == :upgrade
   end
 
   def downgraded?
@@ -165,17 +158,10 @@ class Subscription < ApplicationRecord
       return false
     end
 
-    interval_weights = {"weekly" => 1, "monthly" => 2, "quarterly" => 3, "semiannual" => 4, "yearly" => 5}
-    current_weight = interval_weights[plan.interval.to_s] || 0
-    next_weight = interval_weights[next_subscription.plan.interval.to_s] || 0
-
-    if next_weight < current_weight
-      true
-    elsif next_weight > current_weight
-      false
-    else
-      plan.yearly_amount_cents > next_subscription.plan.yearly_amount_cents
-    end
+    Plans::ChangeClassificationService.call(
+      current_plan: plan,
+      target_plan: next_subscription.plan
+    ).classification == :downgrade
   end
 
   def trial_end_date

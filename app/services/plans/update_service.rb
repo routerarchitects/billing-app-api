@@ -324,17 +324,10 @@ module Plans
       Subscription.where(plan:, status: :pending).find_each do |subscription|
         next unless subscription.previous_subscription
 
-        interval_weights = {"weekly" => 1, "monthly" => 2, "quarterly" => 3, "semiannual" => 4, "yearly" => 5}
-        previous_weight = interval_weights[subscription.previous_subscription.plan.interval.to_s] || 0
-        new_weight = interval_weights[plan.interval.to_s] || 0
-
-        is_upgrade = if new_weight > previous_weight
-          true
-        elsif new_weight < previous_weight
-          false
-        else
-          plan.yearly_amount_cents >= subscription.previous_subscription.plan.yearly_amount_cents
-        end
+        is_upgrade = Plans::ChangeClassificationService.call(
+          current_plan: subscription.previous_subscription.plan,
+          target_plan: plan
+        ).classification == :upgrade
 
         if is_upgrade
           Subscriptions::PlanUpgradeService.call(

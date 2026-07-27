@@ -421,6 +421,20 @@ RSpec.describe Subscription do
 
         it { expect(previous_subscription).to be_upgraded }
       end
+
+      context "when current is monthly (yearly-equivalent $1,200) and target is yearly ($1,000)" do
+        let(:previous_plan) { create(:plan, interval: "monthly", amount_cents: 10_000) } # 10,000 * 12 = 120,000 cents
+        let(:plan) { create(:plan, interval: "yearly", amount_cents: 100_000) } # 100,000 cents
+
+        it { expect(previous_subscription).to be_upgraded }
+      end
+
+      context "when different intervals have equal yearly-equivalent amounts (monthly $1,200 to yearly $1,200)" do
+        let(:previous_plan) { create(:plan, interval: "monthly", amount_cents: 10_000) } # 10,000 * 12 = 120,000 cents
+        let(:plan) { create(:plan, interval: "yearly", amount_cents: 120_000) } # 120,000 cents
+
+        it { expect(previous_subscription).to be_upgraded }
+      end
     end
   end
 
@@ -459,6 +473,20 @@ RSpec.describe Subscription do
           previous_plan.update!(interval: "yearly")
           plan.update!(interval: "monthly")
         end
+
+        it { expect(previous_subscription).to be_downgraded }
+      end
+
+      context "when current is yearly ($1,000) and target is monthly (yearly-equivalent $1,200)" do
+        let(:previous_plan) { create(:plan, interval: "yearly", amount_cents: 100_000) } # 100,000 cents
+        let(:plan) { create(:plan, interval: "monthly", amount_cents: 10_000) } # 10,000 * 12 = 120,000 cents
+
+        it { expect(previous_subscription).to be_downgraded }
+      end
+
+      context "when different intervals have equal yearly-equivalent amounts (yearly $1,200 to monthly $1,200)" do
+        let(:previous_plan) { create(:plan, interval: "yearly", amount_cents: 120_000) } # 120,000 cents
+        let(:plan) { create(:plan, interval: "monthly", amount_cents: 10_000) } # 10,000 * 12 = 120,000 cents
 
         it { expect(previous_subscription).to be_downgraded }
       end
