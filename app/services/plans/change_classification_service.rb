@@ -11,11 +11,6 @@ module Plans
     end
 
     def call
-      if current_plan.id == target_plan.id
-        result.classification = nil
-        return result
-      end
-
       interval_weights = {"weekly" => 1, "monthly" => 2, "quarterly" => 3, "semiannual" => 4, "yearly" => 5}
       current_weight = interval_weights[current_plan.interval.to_s] || 0
       target_weight = interval_weights[target_plan.interval.to_s] || 0
