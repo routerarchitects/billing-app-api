@@ -12,8 +12,8 @@ module Plans
 
     def call
       interval_weights = {"weekly" => 1, "monthly" => 2, "quarterly" => 3, "semiannual" => 4, "yearly" => 5}
-      current_weight = interval_weights[current_plan.interval.to_s] || 0
-      target_weight = interval_weights[target_plan.interval.to_s] || 0
+      current_weight = interval_weights.fetch(current_plan.interval.to_s)
+      target_weight = interval_weights.fetch(target_plan.interval.to_s)
 
       result.classification = if target_weight > current_weight
         :upgrade
