@@ -74,7 +74,17 @@ module Invoices
       end
 
       def upgrade?
-        target_plan.yearly_amount_cents >= current_subscription.plan.yearly_amount_cents
+        interval_weights = {"weekly" => 1, "monthly" => 2, "quarterly" => 3, "semiannual" => 4, "yearly" => 5}
+        current_weight = interval_weights[current_subscription.plan.interval.to_s] || 0
+        target_weight = interval_weights[target_plan.interval.to_s] || 0
+
+        if target_weight > current_weight
+          true
+        elsif target_weight < current_weight
+          false
+        else
+          target_plan.yearly_amount_cents >= current_subscription.plan.yearly_amount_cents
+        end
       end
 
       def target_plan

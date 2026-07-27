@@ -143,15 +143,39 @@ class Subscription < ApplicationRecord
   end
 
   def upgraded?
-    return false unless next_subscription
+    unless next_subscription
+      return false
+    end
 
-    plan.yearly_amount_cents <= next_subscription.plan.yearly_amount_cents
+    interval_weights = {"weekly" => 1, "monthly" => 2, "quarterly" => 3, "semiannual" => 4, "yearly" => 5}
+    current_weight = interval_weights[plan.interval.to_s] || 0
+    next_weight = interval_weights[next_subscription.plan.interval.to_s] || 0
+
+    if next_weight > current_weight
+      true
+    elsif next_weight < current_weight
+      false
+    else
+      plan.yearly_amount_cents <= next_subscription.plan.yearly_amount_cents
+    end
   end
 
   def downgraded?
-    return false unless next_subscription
+    unless next_subscription
+      return false
+    end
 
-    plan.yearly_amount_cents > next_subscription.plan.yearly_amount_cents
+    interval_weights = {"weekly" => 1, "monthly" => 2, "quarterly" => 3, "semiannual" => 4, "yearly" => 5}
+    current_weight = interval_weights[plan.interval.to_s] || 0
+    next_weight = interval_weights[next_subscription.plan.interval.to_s] || 0
+
+    if next_weight < current_weight
+      true
+    elsif next_weight > current_weight
+      false
+    else
+      plan.yearly_amount_cents > next_subscription.plan.yearly_amount_cents
+    end
   end
 
   def trial_end_date

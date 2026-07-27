@@ -106,17 +106,47 @@ module Subscriptions
     end
 
     def upgrade?
-      return false unless current_subscription
-      return false if plan.id == current_subscription.plan.id
+      unless current_subscription
+        return false
+      end
 
-      plan.yearly_amount_cents >= current_subscription.plan.yearly_amount_cents
+      if plan.id == current_subscription.plan.id
+        return false
+      end
+
+      interval_weights = {"weekly" => 1, "monthly" => 2, "quarterly" => 3, "semiannual" => 4, "yearly" => 5}
+      current_weight = interval_weights[current_subscription.plan.interval.to_s] || 0
+      target_weight = interval_weights[plan.interval.to_s] || 0
+
+      if target_weight > current_weight
+        true
+      elsif target_weight < current_weight
+        false
+      else
+        plan.yearly_amount_cents >= current_subscription.plan.yearly_amount_cents
+      end
     end
 
     def downgrade?
-      return false unless current_subscription
-      return false if plan.id == current_subscription.plan.id
+      unless current_subscription
+        return false
+      end
 
-      plan.yearly_amount_cents < current_subscription.plan.yearly_amount_cents
+      if plan.id == current_subscription.plan.id
+        return false
+      end
+
+      interval_weights = {"weekly" => 1, "monthly" => 2, "quarterly" => 3, "semiannual" => 4, "yearly" => 5}
+      current_weight = interval_weights[current_subscription.plan.interval.to_s] || 0
+      target_weight = interval_weights[plan.interval.to_s] || 0
+
+      if target_weight < current_weight
+        true
+      elsif target_weight > current_weight
+        false
+      else
+        plan.yearly_amount_cents < current_subscription.plan.yearly_amount_cents
+      end
     end
 
     def create_subscription
