@@ -429,6 +429,24 @@ RSpec.describe Plans::UpdateService do
         end
       end
 
+      context "when there are pending subscriptions which are still downgrades after the amount cents decrease due to interval priority" do
+        let(:pending_plan) { create(:plan, organization:, interval: :weekly, amount_cents: 10) }
+        let(:pending_subscription) do
+          create(:subscription, plan: pending_plan, status: :pending, previous_subscription_id: subscription.id)
+        end
+
+        before { pending_subscription }
+
+        it "does not cancel pending subscriptions" do
+          result = plans_service.call
+
+          updated_plan = result.plan
+          expect(updated_plan.name).to eq("Updated plan name")
+          expect(updated_plan.amount_cents).to eq(5)
+          expect(Subscription.find_by(id: pending_subscription.id).status).to eq("pending")
+        end
+      end
+
       context "when there are pending subscriptions which are not relevant after the amount cents increase" do
         let(:original_plan) { create(:plan, organization:, amount_cents: 150) }
         let(:subscription) { create(:subscription, plan: original_plan, customer: new_customer) }
