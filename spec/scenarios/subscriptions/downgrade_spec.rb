@@ -67,6 +67,8 @@ describe "Subscription Downgrade Scenario", transaction: false do
 
       expect(yearly_subscription.reload).to be_active
       expect(yearly_subscription.next_subscription).to be_pending
+      expect(yearly_subscription.invoices.count).to eq(1)
+      expect(customer.invoices.count).to eq(1)
     end
 
     # NOTE: July 19th 2024: End of yearly billing period, monthly subscription becomes active
