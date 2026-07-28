@@ -15,25 +15,17 @@ RSpec.describe Plans::ChangeClassificationService do
 
   describe "#call" do
     describe "interval transitions" do
-      [
-        # Upgrade transitions
-        {from: "weekly", to: "monthly", expected: :upgrade},
-        {from: "monthly", to: "quarterly", expected: :upgrade},
-        {from: "quarterly", to: "semiannual", expected: :upgrade},
-        {from: "semiannual", to: "yearly", expected: :upgrade},
+      intervals = Plan::INTERVALS.map(&:to_s)
 
-        # Downgrade transitions
-        {from: "monthly", to: "weekly", expected: :downgrade},
-        {from: "quarterly", to: "monthly", expected: :downgrade},
-        {from: "semiannual", to: "quarterly", expected: :downgrade},
-        {from: "yearly", to: "semiannual", expected: :downgrade}
-      ].each do |scenario|
-        it "classifies #{scenario[:from]} -> #{scenario[:to]} as #{scenario[:expected]}" do
-          current_p = create(:plan, organization:, interval: scenario[:from])
-          target_p = create(:plan, organization:, interval: scenario[:to])
+      intervals.permutation(2).each do |from, to|
+        expected = (Plan::INTERVAL_WEIGHTS.fetch(to) > Plan::INTERVAL_WEIGHTS.fetch(from)) ? :upgrade : :downgrade
+
+        it "classifies #{from} -> #{to} as #{expected}" do
+          current_p = create(:plan, organization:, interval: from)
+          target_p = create(:plan, organization:, interval: to)
 
           result = described_class.new(current_plan: current_p, target_plan: target_p).call
-          expect(result.classification).to eq(scenario[:expected])
+          expect(result.classification).to eq(expected)
         end
       end
     end
