@@ -86,8 +86,10 @@ describe "Subscription Downgrade Scenario", transaction: false do
 
       invoice = monthly_subscription.invoices.last
       expect(invoice.fees_amount_cents).to eq(monthly_plan.amount_cents)
-      expect(invoice.invoice_subscriptions.first.from_datetime.iso8601).to eq("2024-07-19T00:00:00Z")
-      expect(invoice.invoice_subscriptions.first.to_datetime.iso8601).to eq("2024-08-18T23:59:59Z")
+
+      invoice_sub = invoice.invoice_subscriptions.find_by(subscription: monthly_subscription)
+      expect(invoice_sub.from_datetime.iso8601).to eq("2024-07-19T00:00:00Z")
+      expect(invoice_sub.to_datetime.iso8601).to eq("2024-08-18T23:59:59Z")
     end
   end
 end
