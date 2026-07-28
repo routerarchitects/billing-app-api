@@ -143,9 +143,7 @@ class Subscription < ApplicationRecord
   end
 
   def upgraded?
-    unless next_subscription
-      return false
-    end
+    return false unless next_subscription
 
     Plans::ChangeClassificationService.call(
       current_plan: plan,
@@ -154,9 +152,7 @@ class Subscription < ApplicationRecord
   end
 
   def downgraded?
-    unless next_subscription
-      return false
-    end
+    return false unless next_subscription
 
     Plans::ChangeClassificationService.call(
       current_plan: plan,

@@ -106,13 +106,8 @@ module Subscriptions
     end
 
     def upgrade?
-      unless current_subscription
-        return false
-      end
-
-      if plan.id == current_subscription.plan.id
-        return false
-      end
+      return false unless current_subscription
+      return false if plan.id == current_subscription.plan.id
 
       Plans::ChangeClassificationService.call(
         current_plan: current_subscription.plan,
@@ -121,13 +116,8 @@ module Subscriptions
     end
 
     def downgrade?
-      unless current_subscription
-        return false
-      end
-
-      if plan.id == current_subscription.plan.id
-        return false
-      end
+      return false unless current_subscription
+      return false if plan.id == current_subscription.plan.id
 
       Plans::ChangeClassificationService.call(
         current_plan: current_subscription.plan,
