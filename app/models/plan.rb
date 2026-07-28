@@ -39,13 +39,15 @@ class Plan < ApplicationRecord
     class_name: "Clickhouse::ActivityLog",
     as: :resource
 
-  INTERVALS = %i[
-    weekly
-    monthly
-    yearly
-    quarterly
-    semiannual
-  ].freeze
+  INTERVAL_WEIGHTS = {
+    "weekly" => 1,
+    "monthly" => 2,
+    "yearly" => 5,
+    "quarterly" => 3,
+    "semiannual" => 4
+  }.freeze
+
+  INTERVALS = INTERVAL_WEIGHTS.keys.map(&:to_sym).freeze
 
   enum :interval, INTERVALS, validate: true
 

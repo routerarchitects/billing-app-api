@@ -4,14 +4,6 @@ module Plans
   class ChangeClassificationService < BaseService
     Result = BaseResult[:classification]
 
-    INTERVAL_WEIGHTS = {
-      "weekly" => 1,
-      "monthly" => 2,
-      "quarterly" => 3,
-      "semiannual" => 4,
-      "yearly" => 5
-    }.freeze
-
     def initialize(current_plan:, target_plan:)
       super()
       @current_plan = current_plan
@@ -19,8 +11,8 @@ module Plans
     end
 
     def call
-      current_weight = INTERVAL_WEIGHTS.fetch(current_plan.interval.to_s)
-      target_weight = INTERVAL_WEIGHTS.fetch(target_plan.interval.to_s)
+      current_weight = Plan::INTERVAL_WEIGHTS.fetch(current_plan.interval.to_s)
+      target_weight = Plan::INTERVAL_WEIGHTS.fetch(target_plan.interval.to_s)
 
       result.classification = if target_weight > current_weight
         :upgrade
