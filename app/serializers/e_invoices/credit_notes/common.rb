@@ -16,7 +16,7 @@ module EInvoices
       end
 
       def taxes(&block)
-        resource.fees.group_by(&:taxes_rate).each do |tax_rate, fees|
+        resource.fees.group_by(&:taxes_rate).sort.each do |tax_rate, fees|
           basis_amount = fees.flat_map(&:credit_note_items).sum(&:precise_amount_cents) - (allowances_per_tax_rate[tax_rate] || 0)
           tax_amount = basis_amount * tax_rate.fdiv(100)
           tax_category = tax_category_code(type: fees.first.fee_type, tax_rate: tax_rate)
