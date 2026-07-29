@@ -73,10 +73,13 @@ Rails.application.configure do
     config.cache_store = :redis_cache_store, cache_store_config
   end
 
-  config.license_url = if ENV["LAGO_CLOUD"] == "true" && ENV["RAILS_ENV"] == "staging"
-    "http://license-web.default.svc.cluster.local"
-  else
-    "https://license.getlago.com"
+  # Allow self-hosted deployments to override the license verification endpoint.
+  config.license_url = ENV.fetch("LAGO_LICENSE_URL") do
+    if ENV["LAGO_CLOUD"] == "true" && ENV["RAILS_ENV"] == "staging"
+      "http://license-web.default.svc.cluster.local"
+    else
+      "https://license.getlago.com"
+    end
   end
 
   if ENV["LAGO_SMTP_ADDRESS"].present? && !ENV["LAGO_SMTP_ADDRESS"].empty?
