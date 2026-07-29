@@ -40,7 +40,12 @@ module Plans
       Subscription.where(plan:, status: :pending).find_each do |subscription|
         next unless subscription.previous_subscription
 
-        if plan.yearly_amount_cents >= subscription.previous_subscription.plan.yearly_amount_cents
+        is_upgrade = Plans::ChangeClassificationService.call(
+          current_plan: subscription.previous_subscription.plan,
+          target_plan: plan
+        ).classification == :upgrade
+
+        if is_upgrade
           Subscriptions::PlanUpgradeService.call(
             current_subscription: subscription.previous_subscription,
             plan: plan,

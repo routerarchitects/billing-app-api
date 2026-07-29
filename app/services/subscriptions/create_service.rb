@@ -109,14 +109,20 @@ module Subscriptions
       return false unless current_subscription
       return false if plan.id == current_subscription.plan.id
 
-      plan.yearly_amount_cents >= current_subscription.plan.yearly_amount_cents
+      Plans::ChangeClassificationService.call(
+        current_plan: current_subscription.plan,
+        target_plan: plan
+      ).classification == :upgrade
     end
 
     def downgrade?
       return false unless current_subscription
       return false if plan.id == current_subscription.plan.id
 
-      plan.yearly_amount_cents < current_subscription.plan.yearly_amount_cents
+      Plans::ChangeClassificationService.call(
+        current_plan: current_subscription.plan,
+        target_plan: plan
+      ).classification == :downgrade
     end
 
     def create_subscription

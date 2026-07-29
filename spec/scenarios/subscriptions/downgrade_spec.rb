@@ -29,108 +29,65 @@ describe "Subscription Downgrade Scenario", transaction: false do
 
   let(:subscription_at) { DateTime.new(2023, 7, 19, 12, 12) }
 
-  it "downgrades and bill subscriptions" do
-    subscription = nil
+  it "downgrades and bills subscriptions correctly" do
+    yearly_subscription = nil
 
-    # NOTE: Jul 19th: create the subscription
+    # NOTE: July 19th 2023: Create the yearly subscription (starts active, billed in advance)
     travel_to(subscription_at) do
       create_subscription(
         {
           external_customer_id: customer.external_id,
           external_id: customer.external_id,
-          plan_code: monthly_plan.code,
+          plan_code: yearly_plan.code,
           billing_time: "anniversary",
           subscription_at: subscription_at.iso8601
         }
       )
 
-      subscription = customer.subscriptions.first
-      expect(subscription).to be_active
-      expect(subscription.invoices.count).to eq(1)
+      yearly_subscription = customer.subscriptions.first
+      expect(yearly_subscription).to be_active
+      expect(yearly_subscription.invoices.count).to eq(1)
 
-      invoice = subscription.invoices.last
-      expect(invoice.fees_amount_cents).to eq(monthly_plan.amount_cents)
+      invoice = yearly_subscription.invoices.last
+      expect(invoice.fees_amount_cents).to eq(yearly_plan.amount_cents)
       expect(invoice.invoice_subscriptions.first.from_datetime.iso8601).to eq("2023-07-19T00:00:00Z")
-      expect(invoice.invoice_subscriptions.first.to_datetime.iso8601).to eq("2023-08-18T23:59:59Z")
+      expect(invoice.invoice_subscriptions.first.to_datetime.iso8601).to eq("2024-07-18T23:59:59Z")
     end
 
-    # NOTE: August 19th: Bill subscription
-    travel_to(DateTime.new(2023, 8, 19, 12, 12)) do
-      expect { perform_billing }.to change { subscription.reload.invoices.count }
-
-      expect(subscription.invoices.count).to eq(2)
-
-      invoice = subscription.invoices.order(created_at: :asc).last
-      expect(invoice.fees_amount_cents).to eq(monthly_plan.amount_cents)
-      expect(invoice.invoice_subscriptions.first.from_datetime.iso8601).to eq("2023-08-19T00:00:00Z")
-      expect(invoice.invoice_subscriptions.first.to_datetime.iso8601).to eq("2023-09-18T23:59:59Z")
-      expect(invoice.invoice_subscriptions.first.charges_from_datetime.iso8601).to eq("2023-07-19T12:12:00Z")
-      expect(invoice.invoice_subscriptions.first.charges_to_datetime.iso8601).to eq("2023-08-18T23:59:59Z")
-    end
-
-    # NOTE: September 19th: Bill subscription
-    travel_to(DateTime.new(2023, 9, 19, 12, 12)) do
-      expect { perform_billing }.to change { subscription.reload.invoices.count }
-
-      expect(subscription.invoices.count).to eq(3)
-
-      invoice = subscription.invoices.order(created_at: :asc).last
-      expect(invoice.fees_amount_cents).to eq(monthly_plan.amount_cents)
-      expect(invoice.invoice_subscriptions.first.from_datetime.iso8601).to eq("2023-09-19T00:00:00Z")
-      expect(invoice.invoice_subscriptions.first.to_datetime.iso8601).to eq("2023-10-18T23:59:59Z")
-      expect(invoice.invoice_subscriptions.first.charges_from_datetime.iso8601).to eq("2023-08-19T00:00:00Z")
-      expect(invoice.invoice_subscriptions.first.charges_to_datetime.iso8601).to eq("2023-09-18T23:59:59Z")
-    end
-
-    # NOTE: October 19th: Bill subscription
-    travel_to(DateTime.new(2023, 10, 19, 12, 12)) do
-      expect { perform_billing }.to change { subscription.reload.invoices.count }
-
-      expect(subscription.invoices.count).to eq(4)
-
-      invoice = subscription.invoices.order(created_at: :asc).last
-      expect(invoice.fees_amount_cents).to eq(monthly_plan.amount_cents)
-      expect(invoice.invoice_subscriptions.first.from_datetime.iso8601).to eq("2023-10-19T00:00:00Z")
-      expect(invoice.invoice_subscriptions.first.to_datetime.iso8601).to eq("2023-11-18T23:59:59Z")
-      expect(invoice.invoice_subscriptions.first.charges_from_datetime.iso8601).to eq("2023-09-19T00:00:00Z")
-      expect(invoice.invoice_subscriptions.first.charges_to_datetime.iso8601).to eq("2023-10-18T23:59:59Z")
-    end
-
-    # NOTE: On November 9th: Downgrade to the yearly plan
+    # NOTE: November 9th 2023: Create a downgrade request (monthly plan), should be pending
     travel_to(DateTime.new(2023, 11, 9, 0, 0)) do
       create_subscription(
         {
           external_customer_id: customer.external_id,
           external_id: customer.external_id,
-          plan_code: yearly_plan.code,
+          plan_code: monthly_plan.code,
           billing_time: "anniversary"
         }
       )
 
-      expect(subscription.reload).to be_active
-      expect(subscription.invoices.count).to eq(4)
+      expect(yearly_subscription.reload).to be_active
+      expect(yearly_subscription.next_subscription).to be_pending
+      expect(yearly_subscription.invoices.count).to eq(1)
+      expect(customer.invoices.count).to eq(1)
     end
 
-    # NOTE: November 19th: Bill subscription. Old subscription is terminated and pending one is activated
-    travel_to(DateTime.new(2023, 11, 19, 12, 12)) do
-      expect { perform_billing }.to change { subscription.reload.invoices.count }
-      expect(subscription.reload).to be_terminated
-      expect(subscription.invoices.count).to eq(5)
-      expect(customer.invoices.count).to eq(5)
+    # NOTE: July 19th 2024: End of yearly billing period, monthly subscription becomes active
+    travel_to(DateTime.new(2024, 7, 19, 12, 12)) do
+      expect { perform_billing }.to change { customer.subscriptions.find_by(status: :pending) }.to(nil)
 
-      new_subscription = subscription.reload.next_subscription
+      expect(yearly_subscription.reload).to be_terminated
 
-      expect(new_subscription.reload).to be_active
-      expect(new_subscription.invoices.count).to eq(1)
+      monthly_subscription = customer.subscriptions.order(created_at: :asc).last
+      expect(monthly_subscription).to be_active
+      expect(monthly_subscription.plan.code).to eq(monthly_plan.code)
+      expect(monthly_subscription.invoices.count).to eq(1)
 
-      new_sub_invoice = new_subscription.invoices.order(created_at: :asc).last
-      # There are 243 days from new sub started_at until old subscription subscription_at. Also, 2024 is a leap year
-      # Also for old pay in advance plan there are no charges so total amount is zero
-      expect(new_sub_invoice.fees_amount_cents).to eq(0 + (yearly_plan.amount_cents.fdiv(366) * 243).round)
-      expect(new_subscription.invoice_subscriptions.order(created_at: :desc).first.from_datetime.iso8601)
-        .to eq("2023-11-19T00:00:00Z")
-      expect(new_subscription.invoice_subscriptions.order(created_at: :desc).first.to_datetime.iso8601)
-        .to eq("2024-07-18T23:59:59Z")
+      invoice = monthly_subscription.invoices.last
+      expect(invoice.fees_amount_cents).to eq(monthly_plan.amount_cents)
+
+      invoice_sub = invoice.invoice_subscriptions.find_by(subscription: monthly_subscription)
+      expect(invoice_sub.from_datetime.iso8601).to eq("2024-07-19T00:00:00Z")
+      expect(invoice_sub.to_datetime.iso8601).to eq("2024-08-18T23:59:59Z")
     end
   end
 

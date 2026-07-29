@@ -74,7 +74,10 @@ module Invoices
       end
 
       def upgrade?
-        target_plan.yearly_amount_cents >= current_subscription.plan.yearly_amount_cents
+        Plans::ChangeClassificationService.call(
+          current_plan: current_subscription.plan,
+          target_plan: target_plan
+        ).classification == :upgrade
       end
 
       def target_plan

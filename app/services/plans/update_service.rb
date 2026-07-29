@@ -312,7 +312,12 @@ module Plans
       return unless plan.subscriptions.active.exists?
 
       Subscription.where(previous_subscription: plan.subscriptions.active, status: :pending).find_each do |sub|
-        sub.mark_as_canceled! if plan.amount_cents < sub.plan.amount_cents
+        classification = Plans::ChangeClassificationService.call(
+          current_plan: plan,
+          target_plan: sub.plan
+        ).classification
+
+        sub.mark_as_canceled! if classification == :upgrade
       end
     end
 
@@ -324,7 +329,12 @@ module Plans
       Subscription.where(plan:, status: :pending).find_each do |subscription|
         next unless subscription.previous_subscription
 
-        if plan.yearly_amount_cents >= subscription.previous_subscription.plan.yearly_amount_cents
+        is_upgrade = Plans::ChangeClassificationService.call(
+          current_plan: subscription.previous_subscription.plan,
+          target_plan: plan
+        ).classification == :upgrade
+
+        if is_upgrade
           Subscriptions::PlanUpgradeService.call(
             current_subscription: subscription.previous_subscription,
             plan: plan,

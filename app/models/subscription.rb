@@ -145,13 +145,19 @@ class Subscription < ApplicationRecord
   def upgraded?
     return false unless next_subscription
 
-    plan.yearly_amount_cents <= next_subscription.plan.yearly_amount_cents
+    Plans::ChangeClassificationService.call(
+      current_plan: plan,
+      target_plan: next_subscription.plan
+    ).classification == :upgrade
   end
 
   def downgraded?
     return false unless next_subscription
 
-    plan.yearly_amount_cents > next_subscription.plan.yearly_amount_cents
+    Plans::ChangeClassificationService.call(
+      current_plan: plan,
+      target_plan: next_subscription.plan
+    ).classification == :downgrade
   end
 
   def trial_end_date

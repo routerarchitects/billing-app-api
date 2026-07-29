@@ -52,7 +52,7 @@ module EInvoices
       end
 
       def taxes(&block)
-        invoice.fees.group_by(&:taxes_rate).map do |tax_rate, fees|
+        invoice.fees.group_by(&:taxes_rate).sort.map do |tax_rate, fees|
           total_taxes = fees.sum(&:taxes_precise_amount_cents)
           charged_amount = if tax_rate > 0
             (total_taxes * 100).fdiv(tax_rate)
